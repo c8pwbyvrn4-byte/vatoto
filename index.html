@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VATOTO - 100 משחקים</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;color:#fff;font-family:Arial;direction:rtl}
+header{background:linear-gradient(90deg,#ff0000,#000);padding:20px;text-align:center;position:sticky;top:0;z-index:10}
+header h1{font-size:40px;letter-spacing:3px}
+header p{opacity:.8;margin-top:5px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;padding:20px}
+.card{background:#1a1a1a;border:2px solid #222;border-radius:12px;padding:15px;text-align:center;cursor:pointer;transition:.2s}
+.card:hover{border-color:#ff0000;transform:translateY(-3px)}
+.card .icon{font-size:35px;margin-bottom:8px}
+.card h3{font-size:13px}
+.cat{grid-column:1/-1;background:#ff0000;color:#fff;padding:8px 15px;border-radius:20px;margin-top:10px;font-weight:bold;width:fit-content}
+#gameModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:100;flex-direction:column}
+#gameModal.active{display:flex}
+#gameHeader{background:#111;padding:10px;display:flex;justify-content:space-between;align-items:center}
+#gameFrame{flex:1;border:0;width:100%;background:#000}
+button{background:#ff0000;color:#fff;border:0;padding:8px 18px;border-radius:20px;cursor:pointer}
+</style>
+</head>
+<body>
+<header>
+<h1>VATOTO</h1>
+<p>100 משחקים כמו רובלוקס - בלי הורדה!</p>
+</header>
+
+<div class="grid" id="games"></div>
+
+<div id="gameModal">
+<div id="gameHeader">
+<span id="gameTitle"></span>
+<button onclick="closeGame()">✕ סגור</button>
+</div>
+<iframe id="gameFrame"></iframe>
+</div>
+
+<script>
+const games=[
+["Obby פארקור","🏃","https://www.crazygames.com/embed/obby-parkour"],
+["בריחה מהכלא","🔒","https://www.crazygames.com/embed/escape-from-prison"],
+["מירוץ מכוניות","🏎️","https://www.crazygames.com/embed/demolition-derby"],
+["יריות FPS","🔫","https://www.crazygames.com/embed/bullet-force"],
+["מיינקראפט","⛏️","https://classic.minecraft.net/"],
+["אופנועים","🏍️","https://www.crazygames.com/embed/moto-x3m"],
+["כדורגל","⚽","https://www.crazygames.com/embed/football-legends"],
+["בנייה","🏗️","https://www.crazygames.com/embed/buildnow-gg"],
+["זומבים","🧟","https://www.crazygames.com/embed/zombie-derby"],
+["טיסה","✈️","https://www.crazygames.com/embed/flight-simulator"],
+];
+while(games.length<100){
+games.push([`משחק ${games.length+1} - בקרוב!`,`🎮`,`https://www.crazygames.com/`]);
+}
+const grid=document.getElementById('games');
+let html='<div class=\"cat\">🔥 הכי פופולריים</div>';
+games.forEach((g,i)=>{
+html+=`<div class=\"card\" onclick=\"play(${i})\"><div class=\"icon\">${g[1]}</div><h3>${g[0]}</h3></div>`;
+if(i==9) html+='<div class=\"cat\">🎯 אקשן ויריות</div>';
+if(i==29) html+='<div class=\"cat\">🏎️ מירוצים</div>';
+if(i==59) html+='<div class=\"cat\">🧩 עוד משחקים</div>';
+});
+grid.innerHTML=html;
+
+function play(i){
+document.getElementById('gameTitle').innerText=games[i][0];
+document.getElementById('gameFrame').src=games[i][2];
+document.getElementById('gameModal').classList.add('active');
+}
+function closeGame(){
+document.getElementById('gameModal').classList.remove('active');
+document.getElementById('gameFrame').src='';
+}
+</script>
+</body>
+</html>
