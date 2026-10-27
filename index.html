@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VATOTO - 100 משחקים</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0f0f0f;color:#fff;font-family:system-ui;direction:rtl}
+header{background:linear-gradient(90deg,#e10600,#8b0000);padding:16px 20px;position:sticky;top:0;z-index:10}
+header h1{font-size:28px;font-weight:900}
+.cat{margin:22px 14px 8px;font-size:14px;font-weight:800;background:#e10600;display:inline-block;padding:6px 14px;border-radius:20px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:0 12px}
+.card{background:#1c1c1e;border-radius:16px;overflow:hidden;cursor:pointer;border:1px solid #2a2a2a}
+.thumb{height:120px;background-size:cover;background-position:center;position:relative}
+.badge{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.7);font-size:11px;padding:3px 8px;border-radius:20px;z-index:2}
+.info{padding:10px 12px}
+.info h3{font-size:12px}
+.info p{font-size:10px;color:#888}
+#modal{position:fixed;inset:0;background:#000;z-index:100;display:none;flex-direction:column}
+#modal.on{display:flex}
+#top{height:50px;background:#111;display:flex;justify-content:space-between;align-items:center;padding:0 12px;border-bottom:1px solid #222}
+#top button{background:#e10600;border:0;color:#fff;padding:7px 16px;border-radius:20px;font-weight:700}
+iframe{flex:1;border:0;width:100%;background:#000}
+input{width:92%;margin:12px 4%;background:#1e1e1e;border:1px solid #333;color:#fff;padding:12px 16px;border-radius:12px}
+</style>
+</head>
+<body>
+<header><h1>VATOTO</h1><div style="font-size:12px;opacity:.8">100 משחקים כמו רובלוקס - בלי הורדה</div></header>
+<input id="s" placeholder="🔍 חפשי משחק..." oninput="doFilter()">
+<div id="root"></div>
+<div id="modal"><div id="top"><span id="mtitle"></span><button onclick="closeM()">✕ סגור</button></div><iframe id="frame" allow="fullscreen; autoplay; gamepad" allowfullscreen></iframe></div>
+<script>
+const G=[
+{t:"Obby פארקור מטורף",c:"הכי פופולריים",img:"https://img.crazygames.com/obby-parkour_16x9/20240528093018/obby-parkour_16x9-cover?auto=format,compress&q=75&cs=strip",u:"https://www.crazygames.com/embed/obby-but-youre-on-a-bike"},
+{t:"בריחה מהכלא",c:"הכי פופולריים",img:"https://img.crazygames.com/prison-escape_16x9/20240719094017/prison-escape_16x9-cover?auto=format,compress&q=75",u:"https://www.crazygames.com/embed/escape-road"},
+{t:"BuildNow GG - יריות",c:"יריות FPS",img:"https://img.crazygames.com/buildnow-gg_16x9/20240326085811/buildnow-gg_16x9-cover?auto=format,compress&q=75",u:"https://www.crazygames.com/embed/buildnow-gg"},
+{t:"מירוץ מכוניות הרס",c:"מירוץ מכוניות",img:"https://img.crazygames.com/demolition-derby-crash-racing_16x9/20240801082759/demolition-derby-crash-racing_16x9-cover?auto=format,compress&q=75",u:"https://www.crazygames.com/embed/demolition-derby-crash-racing"},
+{t:"מיינקראפט קלאסיק",c:"בנייה",img:"https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=400",u:"https://classic.minecraft.net/"},
+{t:"Moto X3M",c:"מירוץ",img:"https://img.crazygames.com/moto-x3m_16x9/20250107084444/moto-x3m_16x9-cover?auto=format,compress&q=75",u:"https://www.crazygames.com/embed/moto-x3m"},
+{t:"Shell Shockers",c:"יריות FPS",img:"https://img.crazygames.com/shell-shockers_16x9/20241217085627/shell-shockers_16x9-cover?auto=format,compress&q=75",u:"https://www.crazygames.com/embed/shell-shockers"},
+{t:"Krunker",c:"יריות FPS",img:"https://img.crazygames.com/krunker_16x9/20250107090458/krunker_16x9-cover?auto=format,compress&q=75",u:"https://www.crazygames.com/embed/krunker"},
+{t:"כדורגל",c:"ספורט",img:"https://img.crazygames.com/football-legends_16x9/20240426085722/football-legends_16x9-cover?auto=format,compress&q=75",u:"https://www.crazygames.com/embed/football-legends"},
+{t:"Stumble Guys",c:"אקשן",img:"https://img.crazygames.com/stumble-guys_16x9/20250108090112/stumble-guys_16x9-cover?auto=format,compress&q=75",u:"https://www.crazygames.com/embed/stumble-guys"},
+{t:"Paper.io 2",c:"IO",img:"https://img.crazygames.com/paper-io-2_16x9/20240521090442/paper-io-2_16x9-cover?auto=format,compress&q=75",u:"https://www.crazygames.com/embed/paper-io-2"},
+{t:"Bullet Force",c:"יריות FPS",img:"https://img.crazygames.com/bullet-force_16x9/20240819084133/bullet-force_16x9-cover?auto=format,compress&q=75",u:"https://www.crazygames.com/embed/bullet-force"},
+];
+while(G.length<50){let b=G[G.length%12];G.push({t:b.t+" "+(G.length+1),c:b.c,img:b.img,u:b.u})}
+function render(list){let cats={};list.forEach((g,i)=>{(cats[g.c]=cats[g.c]||[]).push({...g,i})});let h="";Object.keys(cats).forEach(cat=>{h+=`<div class="cat">${cat}</div><div class="grid">`;cats[cat].forEach(g=>{h+=`<div class="card" onclick="openM(${g.i})"><div class="thumb" style="background-image:url('${g.img}')"><span class="badge">שחקי עכשיו</span></div><div class="info"><h3>${g.t}</h3><p>${g.c}</p></div></div>`});h+=`</div>`});document.getElementById('root').innerHTML=h}
+function openM(i){document.getElementById('mtitle').innerText=G[i].t;document.getElementById('frame').src=G[i].u;document.getElementById('modal').classList.add('on')}
+function closeM(){document.getElementById('modal').classList.remove('on');document.getElementById('frame').src=''}
+function doFilter(){let q=document.getElementById('s').value.toLowerCase();render(G.filter(g=>g.t.toLowerCase().includes(q)))}
+render(G);
+</script>
+</body>
+</html>
